@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Compliance KPI Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      margin: 20px;
+      background-color: #f4f8fb;
+      color: #333;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #1a4e85;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 3px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 6px;
+      font-size: 12px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #fff;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 40px;
+    }
+    .section {
+      background-color: #e8f1fb;
+      border: 1px solid #bfdaf2;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+    }
+    .signature-group {
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      padding: 6px 12px;
+      margin-top: 12px;
+      font-size: 12px;
+      background-color: #1a4e85;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #145185;
+    }
+    #average-rating {
+      font-weight: bold;
+      font-size: 14px;
+      margin-top: 12px;
+      color: #1a4e85;
+    }
+    @media print {
+      button {
+        display: none;
+      }
+      body {
+        font-size: 10px;
+        margin: 10px;
+        background-color: #fff;
+      }
+      .section {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Compliance KPI Form</h1>
+
+  <form id="kpi-form">
+    <div class="form-group">
+      <label for="review-or-onboarding">Review or Onboarding:</label>
+      <select id="review-or-onboarding">
+        <option value="review">Review</option>
+        <option value="onboarding">Onboarding</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Name of Customer:</label>
+      <input type="text" id="name-of-customer" />
+    </div>
+    <div class="form-group">
+      <label>Name of Responsible Officer:</label>
+      <input type="text" id="name-of-officer" />
+    </div>
+    <div class="form-group">
+      <label>Branch/Unit:</label>
+      <input type="text" id="branch" />
+    </div>
+    <div class="form-group">
+      <label>Division:</label>
+      <input type="text" id="division" />
+    </div>
+
+    <h2>Part A: Customer Review Evaluation</h2>
+
+    <div id="sections-container"></div>
+
+    <h2>Part B: Compliance Officer's Comments</h2>
+    <div class="form-group">
+      <textarea id="compliance-officer-comments" placeholder="Enter comments..."></textarea>
+    </div>
+
+    <div class="signature-group">
+      <div style="flex: 1">
+        <label>Name and Signature of Compliance Officer:</label>
+        <input type="text" id="compliance-officer-name" />
+      </div>
+      <div>
+        <label>Date:</label>
+        <input type="date" id="compliance-officer-date" />
+      </div>
+    </div>
+
+    <h2>Part C: Deputy Manager/Manager of AML Monitoring Unit Comments</h2>
+    <div class="form-group">
+      <textarea id="deputy-manager-comments" placeholder="Enter comments..."></textarea>
+    </div>
+
+    <div class="signature-group">
+      <div style="flex: 1">
+        <label>Name and Signature of Deputy Manager:</label>
+        <input type="text" id="deputy-manager-name" />
+      </div>
+      <div>
+        <label>Date:</label>
+        <input type="date" id="deputy-manager-date" />
+      </div>
+    </div>
+
+    <p id="average-rating">Average Rating: 0</p>
+
+    <button type="submit">Submit</button>
+    <button type="button" onclick="sendEmail()">Email This Page</button>
+  </form>
+
+  <script>
+    const sectionsContainer = document.getElementById('sections-container');
+
+    function createSections(count) {
+      sectionsContainer.innerHTML = '';
+      for (let i = 1; i <= count; i++) {
+        const div = document.createElement('div');
+        div.className = 'section';
+        div.innerHTML = `
+          <label>Section ${i} Rating (1–5):</label>
+          <input type="number" min="1" max="5" id="rating-${i}" />
+          <label>Comments:</label>
+          <textarea id="comments-${i}"></textarea>
+        `;
+        sectionsContainer.appendChild(div);
+      }
+    }
+
+    function updateSections() {
+      const type = document.getElementById('review-or-onboarding').value;
+      createSections(type === 'onboarding' ? 6 : 5);
+    }
+
+    document.getElementById('review-or-onboarding').addEventListener('change', updateSections);
+
+    document.getElementById('kpi-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const totalSections = document.getElementById('review-or-onboarding').value === 'onboarding' ? 6 : 5;
+      let total = 0, count = 0;
+      for (let i = 1; i <= totalSections; i++) {
+        const rating = parseFloat(document.getElementById(`rating-${i}`).value);
+        if (!isNaN(rating)) {
+          total += rating;
+          count++;
+        }
+      }
+      const average = count ? (total / count).toFixed(2) : 0;
+      document.getElementById('average-rating').innerText = `Average Rating: ${average}`;
+    });
+
+    function sendEmail() {
+      const totalSections = document.getElementById('review-or-onboarding').value === 'onboarding' ? 6 : 5;
+
+      let body = `Compliance KPI Form Results\n\n`;
+      body += `Type: ${document.getElementById('review-or-onboarding').value}\n`;
+      body += `Customer: ${document.getElementById('name-of-customer').value}\n`;
+      body += `Officer: ${document.getElementById('name-of-officer').value}\n`;
+      body += `Branch: ${document.getElementById('branch').value}\n`;
+      body += `Division: ${document.getElementById('division').value}\n\n`;
+
+      let total = 0, count = 0;
+
+      for (let i = 1; i <= totalSections; i++) {
+        const rating = document.getElementById(`rating-${i}`).value || "N/A";
+        const comments = document.getElementById(`comments-${i}`).value || "";
+        body += `Section ${i} - Rating: ${rating}, Comments: ${comments}\n`;
+        if (!isNaN(parseFloat(rating))) {
+          total += parseFloat(rating);
+          count++;
+        }
+      }
+
+      const average = count ? (total / count).toFixed(2) : 0;
+      body += `\nAverage Rating: ${average}\n\n`;
+
+      body += `Compliance Officer Comments: ${document.getElementById('compliance-officer-comments').value}\n`;
+      body += `Compliance Officer: ${document.getElementById('compliance-officer-name').value} | Date: ${document.getElementById('compliance-officer-date').value}\n\n`;
+
+      body += `Deputy Manager Comments: ${document.getElementById('deputy-manager-comments').value}\n`;
+      body += `Deputy Manager: ${document.getElementById('deputy-manager-name').value} | Date: ${document.getElementById('deputy-manager-date').value}\n`;
+
+      const subject = `Compliance KPI Form – ${document.getElementById('name-of-customer').value}`;
+      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+
+    // Initialize default section on load
+    window.onload = updateSections;
+  </script>
+</body>
+</html>
+
+
+
+
+
+
