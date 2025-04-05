@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Compliance KPI Form</title>
+  <title>Compliance KPI's Form</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -49,6 +49,7 @@
       padding: 10px;
       margin-bottom: 8px;
       border-radius: 6px;
+      position: relative;
     }
     .signature-group {
       display: flex;
@@ -73,6 +74,36 @@
       margin-top: 12px;
       color: #1a4e85;
     }
+
+    .tooltip-container {
+      position: relative;
+      cursor: help;
+      display: inline-block;
+      color: #1a4e85;
+    }
+
+    .tooltip-box {
+      display: none;
+      position: absolute;
+      top: 120%;
+      left: 0;
+      background-color: #fff;
+      color: #333;
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-size: 11px;
+      line-height: 1.4;
+      z-index: 10;
+      width: 320px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      white-space: normal;
+    }
+
+    .tooltip-container:hover .tooltip-box {
+      display: block;
+    }
+
     @media print {
       button {
         display: none;
@@ -89,7 +120,7 @@
   </style>
 </head>
 <body>
-  <h1>Compliance KPI Form</h1>
+  <h1>Compliance KPIs Form</h1>
 
   <form id="kpi-form">
     <div class="form-group">
@@ -118,7 +149,6 @@
     </div>
 
     <h2>Part A: Customer Review Evaluation</h2>
-
     <div id="sections-container"></div>
 
     <h2>Part B: Compliance Officer's Comments</h2>
@@ -162,44 +192,180 @@
   <script>
     const sectionsContainer = document.getElementById('sections-container');
 
-    function createSections(count) {
+    const sectionsData = [
+      {
+        title: "Section 1",
+        description: `DESCRIPTION:
+        Has the review been rejected? If yes the depending on the reason for the rejection, the relevant grade will be awarded. If grade awarded is either 1 or 2 ,then no further evaluation on the quality of the application will be performed and the Total grade awarded will be 1 or 2.`,
+        ratings: [
+          "Rating 1: Against Bank's Customer Acceptance Policy",
+          "Rating 2: Improper evaluation of risk",
+          "Rating 3: No issues but rejection related to unknown compliance issues",
+          "Rating 4: No issues, mitigations made but still rejected due to risk",
+          "Rating 5: Application was not rejected"
+        ]
+      },
+      {
+        title: "Section 2",
+        description: `DESCRIPTION: Performance of all relevant checks (Worldcheck, Offshore Leaks, Internet Searches) on all parties involved:
+On all individuals connected to the company including Directors, Shareholders, UBOs, Secretary, Winbank users, contact persons and card holders.
+Any related companies mentioned in the AFS
+Any companies mentioned in the UBO's/customer's CV (if applicable).
+: Performance of all relevant checks including Worldcheck, Offshore Leaks, ICIJ, Sanctions, Interpol Red Notices, adverse news search, etc. Checks should be thorough and documented.`,
+        ratings: [
+          "Rating 1: NO",
+          "Rating 2: Partial performance",
+          "Rating 3: Adequate but limited checks",
+          "Rating 4: Comprehensive checks with minor gaps",
+          "Rating 5: All relevant checks thoroughly performed"
+        ]
+      },
+      {
+        title: "Section 3",
+        description: `DESCRIPTION: Evaluation on all relevant checks mentioned above.`,
+        ratings: [
+          "Rating 1: NO evaluation",
+          "Rating 2: Not signed/dated",
+          "Rating 3: Signed, dated, risks identified",
+          "Rating 4: Signed, risks identified and explained",
+          "Rating 5: Additional searches, full analysis"
+        ]
+      },
+      {
+        title: "Section 4",
+        description: `DESCRIPTION: Evaluation of Economic Profile of Customer:
+1. Line of Business
+a) matches the purpose of the account
+b) matches the counterparties (declared and actual)
+c) UBO background (professional experience)
+d) AFS
+e) is the turnover justified in connection to the
+Line of Business
+2. AFS (not applicable in case of Individual customer)
+a) is the turnover justified based on the AFS
+b) related/affiliated companies/subsidiaries
+c) is income generated from business activities
+or elsewhere? if so, has this been evaluated.`,
+        ratings: [
+          "Rating 1: No evaluation performed",
+          "Rating 2: Partial evaluation",
+          "Rating 3: Risks identified",
+          "Rating 4: Risks identified and elaborated",
+          "Rating 5: Full profile evaluation and analysis"
+        ]
+      },
+      {
+        title: "Section 5",
+        description: `DESCRIPTION: Evaluation of UBO/customer (in the case of a natural person)
+For UBOs, the tax declaration is not compulsory and it is one possible option of establishing the source of wealth/income.
+1. Tax Declaration
+a) Additional source of income
+b) Indication of additional tax residency
+c) Ownership of other business/companies
+d) Size of Wealth matches the declared turnover and purpose of account (if applicable)
+2. CV
+a) Any high-risk elements identified`,
+        ratings: [
+          "Rating 1: No evaluation",
+          "Rating 2: Partial evaluation",
+          "Rating 3: Risks identified",
+          "Rating 4: Risks elaborated",
+          "Rating 5: Full background and wealth analysis"
+        ]
+      },
+      {
+        title: "Section 6",
+        description: `DESCRIPTION:
+Transactional Review. The following list of examples is indicative. Depending on the customer, additional evaluation may be required:
+1. Counterparties:
+a) Wordcheck and google searches performed on actual and declared and all hits/findings evaluated and handled any high risk/prohibited countries?
+c) Turnover per year for major counterparties
+d) Do they match the Line of Business
+e) Supporting obtained for major counterparties or counterparties with high risk factors.
+f) Explanation on purpose of transactions
+2. Turnover: Actual Versus Expected Turnover - is there a deviation? if so, is it justified?
+3. FCRM Alerts - how were they closed?`,
+        ratings: [
+          "Rating 1: No transactional review",
+          "Rating 2: Statement only, no analysis",
+          "Rating 3: Supporting docs, no analysis",
+          "Rating 4: Docs with partial analysis",
+          "Rating 5: Full documented transactional review"
+        ]
+      },
+      {
+        title: "Section 7",
+        description: `DESCRIPTION: Evaluation of changes and conditions (if applicable):
+- Risk level
+• (Additional) High risk factor, evaluation and any possible impact on the Bank
+• Line of business, counterparties, turnover, dormancy, additional currency etc (as per the provisions of circular)
+- Have any possible AMLCO conditions added at account opening been evaluated?
+If yes, have these changes been evaluated?`,
+        ratings: [
+          "Rating 1: No evaluation",
+          "Rating 2: List only",
+          "Rating 3: List with explanation",
+          "Rating 4: Explanation + risk identification",
+          "Rating 5: Fully documented and justified"
+        ]
+      }
+    ];
+
+    function createSections() {
       sectionsContainer.innerHTML = '';
-      for (let i = 1; i <= count; i++) {
+      sectionsData.forEach((section, index) => {
+        const sectionNumber = index + 1;
         const div = document.createElement('div');
         div.className = 'section';
+
+        const ratingOptions = section.ratings.map(r => `<div>${r}</div>`).join('');
+
         div.innerHTML = `
-          <label>Section ${i} Rating (1–5):</label>
-          <input type="number" min="1" max="5" id="rating-${i}" />
+          <label>
+            <span class="tooltip-container">
+              <strong>${section.title}</strong>
+              <span class="tooltip-box">${section.description}</span>
+            </span>
+            Rating (1–5):
+          </label>
+          <input type="number" min="1" max="5" id="rating-${sectionNumber}" />
+          <div style="font-size: 11px; margin-bottom: 6px; color: #333;">
+            <strong>RATING:</strong>
+            ${ratingOptions}
+          </div>
           <label>Comments:</label>
-          <textarea id="comments-${i}"></textarea>
+          <textarea id="comments-${sectionNumber}"></textarea>
         `;
+
         sectionsContainer.appendChild(div);
-      }
+      });
     }
 
     function updateSections() {
-      const type = document.getElementById('review-or-onboarding').value;
-      createSections(type === 'onboarding' ? 6 : 5);
+      createSections();
     }
 
     document.getElementById('review-or-onboarding').addEventListener('change', updateSections);
 
     document.getElementById('kpi-form').addEventListener('submit', function (e) {
       e.preventDefault();
-
-      const totalSections = document.getElementById('review-or-onboarding').value === 'onboarding' ? 6 : 5;
       let total = 0, count = 0;
-      for (let i = 1; i <= totalSections; i++) {
+
+      // Loop through sections and calculate total and count only for rated sections
+      for (let i = 1; i <= sectionsData.length; i++) {
         const rating = parseFloat(document.getElementById(`rating-${i}`).value);
-        if (!isNaN(rating)) {
+
+        if (!isNaN(rating) && rating >= 1 && rating <= 5) { // Ensure valid rating
           total += rating;
           count++;
         }
       }
+
       const average = count ? (total / count).toFixed(2) : 0;
       document.getElementById('average-rating').innerText = `Average Rating: ${average}`;
     });
 
+    
     function sendEmail() {
       const totalSections = document.getElementById('review-or-onboarding').value === 'onboarding' ? 6 : 5;
 
@@ -240,6 +406,7 @@
   </script>
 </body>
 </html>
+
 
 
 
