@@ -185,8 +185,8 @@
 
     <p id="average-rating">Average Rating: 0</p>
 
-    <button type="submit">Submit</button>
-    <button type="button" onclick="sendEmail()">Email This Page</button>
+    <button type="submit">Calculate</button>
+    <button type="button" onclick="sendEmail()">Email Results</button>
   </form>
 
   <script>
@@ -367,7 +367,7 @@ If yes, have these changes been evaluated?`,
 
     
     function sendEmail() {
-      const totalSections = document.getElementById('review-or-onboarding').value === 'onboarding' ? 6 : 5;
+      const totalSections = document.getElementById('review-or-onboarding').value === 'onboarding' ? 6 : 7;
 
       let body = `Compliance KPI Form Results\n\n`;
       body += `Type: ${document.getElementById('review-or-onboarding').value}\n`;
@@ -392,10 +392,10 @@ If yes, have these changes been evaluated?`,
       body += `\nAverage Rating: ${average}\n\n`;
 
       body += `Compliance Officer Comments: ${document.getElementById('compliance-officer-comments').value}\n`;
-      body += `Compliance Officer: ${document.getElementById('compliance-officer-name').value} | Date: ${document.getElementById('compliance-officer-date').value}\n\n`;
+      body += `Compliance Officer: ${document.getElementById('compliance-officer-name').value} , Date: ${document.getElementById('compliance-officer-date').value}\n\n`;
 
       body += `Deputy Manager Comments: ${document.getElementById('deputy-manager-comments').value}\n`;
-      body += `Deputy Manager: ${document.getElementById('deputy-manager-name').value} | Date: ${document.getElementById('deputy-manager-date').value}\n`;
+      body += `Deputy Manager: ${document.getElementById('deputy-manager-name').value} , Date: ${document.getElementById('deputy-manager-date').value}\n`;
 
       const subject = `Compliance KPI Form – ${document.getElementById('name-of-customer').value}`;
       window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
